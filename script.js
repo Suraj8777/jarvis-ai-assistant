@@ -1,37 +1,19 @@
-document.getElementById('send-btn').addEventListener('click', function() {
-    const userInput = document.getElementById('user-input').value;
-    if (userInput.trim() === '') return;
 
-    // Display user message
-    const chatBox = document.getElementById('chat-box');
-    const userMessage = document.createElement('div');
-    userMessage.className = 'message user-message';
-    userMessage.textContent = userInput;
-    chatBox.appendChild(userMessage);
+async function getAIResponse(userInput) {
+    const apiKey = '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';
+    const response = await fetch('https://api.openai.com/v1/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: "text-davinci-003",
+            prompt: userInput,
+            max_tokens: 150
+        })
+    });
 
-    // Clear input
-    document.getElementById('user-input').value = '';
-
-    // Simulate AI response
-    setTimeout(() => {
-        const aiMessage = document.createElement('div');
-        aiMessage.className = 'message ai-message';
-        aiMessage.textContent = getAIResponse(userInput);
-        chatBox.appendChild(aiMessage);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }, 1000);
-});
-
-function getAIResponse(userInput) {
-    // Simple AI response logic
-    const responses = {
-        "hello": "Hello! How can I assist you today?",
-        "how are you": "I'm just a program, but I'm functioning perfectly! How about you?",
-        "what's your name": "I'm Jarvis, your personal AI assistant.",
-        "bye": "Goodbye! Have a great day!",
-        "default": "I'm sorry, I didn't understand that. Can you please rephrase?"
-    };
-
-    const lowerCaseInput = userInput.toLowerCase();
-    return responses[lowerCaseInput] || responses['default'];
+    const data = await response.json();
+    return data.choices[0].text.trim();
 }
